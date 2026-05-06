@@ -95,11 +95,11 @@ for p in ["output/no_partition", "output/partitioned", "output/final"]:
     shutil.rmtree(p, ignore_errors=True)
 
 # Without partitioning
-optimized_df.write.parquet("output/no_partition")
+optimized_df.write.mode("overwrite").parquet("output/no_partition")
 print("❌ Written without partitioning → full scan on every read")
 
 # With partitioning
-optimized_df.write.partitionBy("city").parquet("output/partitioned")
+optimized_df.write.mode("overwrite").partitionBy("city").parquet("output/partitioned")
 print("✅ Written with partitionBy(city) → faster city-level reads\n")
 
 
@@ -139,7 +139,7 @@ drivers_f = spark.read.csv("drivers.csv", header=True, inferSchema=True)
 rides_filtered = rides_f.filter(rides_f.city == "Bangalore")
 df = rides_filtered.join(broadcast(drivers_f), "driver_id")
 result = df.groupBy("city").agg(_sum("fare").alias("total_revenue"))
-result.write.partitionBy("city").parquet("output/final")
+result.write.mode("overwrite").partitionBy("city").parquet("output/final")
 result.show()
 print("✅ Full pipeline complete — output/final written\n")
 

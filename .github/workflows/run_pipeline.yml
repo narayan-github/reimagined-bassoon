@@ -9,6 +9,10 @@ on:
 jobs:
   pyspark-pipeline:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      PYSPARK_PYTHON: python3
+      PYSPARK_DRIVER_PYTHON: python3
 
     steps:
       - name: Checkout code
@@ -26,7 +30,9 @@ jobs:
           java-version: "11"
 
       - name: Install dependencies
-        run: pip install pyspark
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install pyspark
 
       - name: Generate large dataset
         run: |
@@ -46,7 +52,7 @@ jobs:
           "
 
       - name: Run PySpark pipeline
-        run: python pipeline.py
+        run: python3 pipeline.py
 
       - name: Verify Parquet outputs exist
         run: |
