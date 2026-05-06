@@ -1,0 +1,63 @@
+name: PySpark Ride-Sharing Pipeline CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  pyspark-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up Java (required for PySpark)
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "11"
+
+      - name: Install dependencies
+        run: pip install pyspark
+
+      - name: Generate large dataset
+        run: |
+          python3 -c "
+          import csv, random, datetime
+          cities  = ['Bangalore','Delhi','Mumbai','Chennai','Hyderabad']
+          drivers = [101,102,103,104,105]
+          start   = datetime.date(2024,1,1)
+          with open('rides_large.csv','w',newline='') as f:
+              w = csv.writer(f)
+              w.writerow(['ride_id','driver_id','city','fare','trip_distance','ride_date'])
+              for i in range(1,1001):
+                  d = start + datetime.timedelta(days=random.randint(0,89))
+                  w.writerow([i, random.choice(drivers), random.choice(cities),
+                               random.randint(80,600), round(random.uniform(1.5,45.0),2), d])
+          print('rides_large.csv ready')
+          "
+
+      - name: Run PySpark pipeline
+        run: python pipeline.py
+
+      - name: Verify Parquet outputs exist
+        run: |
+          echo "Checking output directories..."
+          ls -lh output/no_partition/
+          ls -lh output/partitioned/
+          ls -lh output/final/
+          echo "✅ All Parquet outputs verified"
+
+      - name: Upload Parquet outputs as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: parquet-outputs
+          path: output/
