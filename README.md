@@ -1,7 +1,7 @@
-# Lab 7 – PySpark Optimization | Ride-Sharing Analytics
+# PySpark Optimization Pipeline — Ride-Sharing Analytics
 
-## Objective
-Build and optimize a PySpark pipeline to process ride-sharing data using:
+## Overview
+A PySpark pipeline that processes ride-sharing data and demonstrates key Spark optimization techniques with measured comparisons:
 - **Broadcast joins** to avoid shuffle
 - **Filter pushdown** to reduce data early
 - **Partitioning strategies** for faster reads
@@ -12,7 +12,7 @@ Build and optimize a PySpark pipeline to process ride-sharing data using:
 |------|-------------|
 | `rides.csv` | Core ride records (ride_id, driver_id, city, fare, ride_date) |
 | `drivers.csv` | Small driver lookup table |
-| `rides_large.csv` | 1000-row dataset for Exercise 3 repartition test |
+| `rides_large.csv` | Larger (1,000-row) dataset for the repartition benchmark |
 
 ## Steps Covered
 | Step | Description |
@@ -34,10 +34,10 @@ Build and optimize a PySpark pipeline to process ride-sharing data using:
 | Broadcast join | Fast — no shuffle |
 | Partitioned data | Faster reads — reduced I/O |
 
-## Exercises
-- **Exercise 1:** Remove broadcast → compare timing
-- **Exercise 2:** Add `trip_distance` column and optimize aggregation
-- **Exercise 3:** Load 1000-row dataset → test repartition(4)
+## Benchmarks & variations
+- Broadcast vs normal join — timing comparison
+- `trip_distance` column added with optimized aggregation
+- repartition(4) tested on the larger dataset
 
 ## Run
 ```bash
